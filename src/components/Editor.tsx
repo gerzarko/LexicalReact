@@ -52,6 +52,20 @@ export function Editor() {
     onError,
   };
 
+  function MyOnChangePlugin(props: {
+    onChange: (editorState: EditorState) => void;
+  }) {
+    const [editor] = useLexicalComposerContext();
+    const { onChange } = props;
+    useEffect(() => {
+      return editor.registerUpdateListener(({ editorState }) => {
+        onChange(editorState);
+      });
+    }, [onChange, editor]);
+
+    return null;
+  }
+
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <PlainTextPlugin
@@ -62,6 +76,11 @@ export function Editor() {
         ErrorBoundary={LexicalErrorBoundary}
       />
       <OnChangePlugin onChange={onChange} />
+      <MyOnChangePlugin
+        onChange={(EditorState) => {
+          console.log(EditorState);
+        }}
+      />
       <HistoryPlugin />
       <MyCustomAutoFocusPlugin />
     </LexicalComposer>
