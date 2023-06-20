@@ -6,6 +6,7 @@ import {
   $createNodeSelection,
   $createRangeSelection,
   $setSelection,
+  removeNode,
   LexicalNode,
 } from "lexical";
 import { useEffect, useState } from "react";
@@ -157,6 +158,7 @@ export function Editor() {
         const root = $getRoot();
         const selection = $getSelection();
         removeNode(selection, false, false);
+
         // if ($isRangeSelection(selection)) {
         //   $setBlocksType(selection, () =>
 
@@ -167,11 +169,11 @@ export function Editor() {
     return <button onClick={addHola}>Chaur</button>;
   }
 
-  function SearchText(): JSX.Element {
+  function SearchAndReplace(): JSX.Element {
     const [editor] = useLexicalComposerContext();
-    const [searchText, setSearchText] = useState("");
-    const [nodesText, setNodesText] = useState();
-    let qsy: object[] = [];
+    const [searchText, setSearchText] = useState();
+    const [replaceText, setReplaceText] = useState();
+    let nodesText: object[] = [];
     const [nodeFound, setNodeFound] = useState([]);
 
     function all() {
@@ -181,16 +183,97 @@ export function Editor() {
         const text: object[] = all.map((node) => {
           return { text: node.__text, key: node.__key };
         });
-        qsy = text;
+        nodesText = text;
         console.log(text);
       });
     }
 
     function selectionNode(nodos: any) {
       editor.update(() => {
-        // const nodeSelection = $createNodeSelection();
-        // nodeSelection.add(nodos[0].key);
-        // $setSelection(nodeSelection);
+        const rangeSelection = $createRangeSelection();
+        const root = $getRoot();
+        $setSelection(rangeSelection);
+        const someNode = $getNodeByKey(nodos[0].key);
+        console.log("selection check", someNode!.__text);
+        const nodeReplacer = $createTextNode(
+          someNode!.__text.replace(searchText, replaceText)
+        );
+        console.log("replacee", nodeReplacer);
+        someNode!.select();
+
+        someNode!.replace(nodeReplacer);
+        someNode!.__text.replace(searchText, replaceText);
+
+        console.log(someNode, "nodo");
+      });
+    }
+    function handleChange(event: any) {
+      setSearchText(event.target.value);
+      console.log(searchText);
+    }
+    function handleChangeReplace(event: any) {
+      setReplaceText(event.target.value);
+      console.log(replaceText);
+    }
+
+    function isText(text: any) {
+      console.log(text.text, "vs", searchText);
+      console.log("esto", text.text.search(searchText));
+      return text.text.search(searchText) >= 0;
+    }
+
+    function handleSubmit(event: any) {
+      event.preventDefault();
+      all();
+
+      if (nodesText.find(isText)) {
+        const nodee: object[] = nodesText.filter(isText);
+        console.log("---------");
+
+        selectionNode(nodee);
+        console.log("---------");
+        console.log(nodee);
+      }
+      console.log(searchText);
+    }
+
+    return (
+      <div>
+        <form onSubmit={handleSubmit}>
+          <label>Search</label>
+          <input onChange={handleChange} type="text" id="searchText"></input>
+          <label>Replace</label>
+          <input
+            type="text"
+            id="replaceText"
+            onChange={handleChangeReplace}
+          ></input>
+          <input type="submit" value="submit" />
+        </form>
+      </div>
+    );
+  }
+
+  function SearchText(): JSX.Element {
+    const [editor] = useLexicalComposerContext();
+    const [searchText, setSearchText] = useState("");
+    let nodesText: object[] = [];
+    const [nodeFound, setNodeFound] = useState([]);
+
+    function all() {
+      editor.update(() => {
+        const root = $getRoot();
+        const all = root.getAllTextNodes();
+        const text: object[] = all.map((node) => {
+          return { text: node.__text, key: node.__key };
+        });
+        nodesText = text;
+        console.log(text);
+      });
+    }
+
+    function selectionNode(nodos: any) {
+      editor.update(() => {
         const rangeSelection = $createRangeSelection();
         const root = $getRoot();
         $setSelection(rangeSelection);
@@ -206,7 +289,7 @@ export function Editor() {
       setSearchText(event.target.value);
     }
 
-    function isText(text) {
+    function isText(text: any) {
       return text.text === searchText;
     }
 
@@ -214,8 +297,8 @@ export function Editor() {
       event.preventDefault();
       all();
 
-      if (qsy.find(isText)) {
-        const nodee: object[] = qsy.filter(isText);
+      if (nodesText.find(isText)) {
+        const nodee: object[] = nodesText.filter(isText);
         nodee.map((nodo) => {
           return console.log(nodo);
         });
@@ -248,22 +331,29 @@ export function Editor() {
       });
     }
 
-    return <button onClick={all}>showALL</button>;
+    return <button onClick={all}>Show TextNodes</button>;
   }
 
-  // });
+  function RegularExpression(): JSX.Element {
+    function check() {
+      const regular = /n/g;
+      const aCheaquear = new RegExp("n", "");
+      const variable = "hola andaana".replace(regular, "chau");
+      console.log(variable);
+    }
 
-  // Get the selection from the EditorState
-
-  // Create a new ParagraphNode
+    return <button onClick={check}>regular expression</button>;
+  }
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <ShowEditorCOmposerState />
-      <AddH1 />
-      <AddText />
-      <DeleteText />
+      {/* <AddH1 /> */}
+      {/* <AddText /> */}
+      {/* <DeleteText /> */}
       <SearchText />
+      <SearchAndReplace />
+      <RegularExpression />
 
       <AllTextNode />
       <PlainTextPlugin
