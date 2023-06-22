@@ -127,17 +127,24 @@ export function Editor() {
     const [editor] = useLexicalComposerContext();
     const [searchText, setSearchText] = useState();
     const [replaceText, setReplaceText] = useState();
-    let nodesText: object[] = [];
+    // let nodesText: object[] = [];
+    const [nodesText, setNodesText] = useState<object[]>();
     const [nodeFound, setNodeFound] = useState([]);
+    interface Nodos {
+      text: string;
+      key: number;
+    }
 
     function all() {
       editor.update(() => {
         const root = $getRoot();
         const all = root.getAllTextNodes();
         const text: object[] = all.map((node) => {
-          return { text: node.__text, key: node.__key };
+          // return { text: node.__text, key: node.__key };
+          const nodosNuevos: Nodos = { text: node.__text, key: node.__key };
+          return nodosNuevos;
         });
-        nodesText = text;
+        setNodesText(text);
         console.log(text);
       });
     }
@@ -162,27 +169,21 @@ export function Editor() {
       });
     }
     function handleChange(event: any) {
-      setSearchText(event.target.value);
-      console.log(searchText);
+      setSearchText(event.target?.value);
     }
     function handleChangeReplace(event: any) {
       setReplaceText(event.target.value);
-      console.log(replaceText);
     }
 
     function isText(text: any) {
-      console.log(text.text, "vs", searchText);
-      console.log("esto", text.text.search(searchText));
       return text.text.search(searchText) >= 0;
     }
 
     function handleSubmit(event: any) {
       event.preventDefault();
       all();
-
-      if (nodesText.find(isText)) {
+      if (nodesText?.find(isText)) {
         const nodee: object[] = nodesText.filter(isText);
-
         selectionNode(nodee);
       }
     }
@@ -190,15 +191,20 @@ export function Editor() {
     return (
       <div>
         <form onSubmit={handleSubmit}>
-          <label>Search</label>
-          <input onChange={handleChange} type="text" id="searchText"></input>
+          <label>Search:</label>
+          <input
+            onChange={handleChange}
+            type="text"
+            id="searchText"
+            className="w-3/12 mx-2  rounded-sm"
+          ></input>
           <label>Replace</label>
           <input
             type="text"
             id="replaceText"
             onChange={handleChangeReplace}
           ></input>
-          <input type="submit" value="submit" />
+          <input type="submit" value="Enter" />
         </form>
       </div>
     );
@@ -216,15 +222,79 @@ export function Editor() {
 
     return <button onClick={all}>Show TextNodes</button>;
   }
+
+  type HeadingTag = "h1" | "h2" | "h3";
+
+  function HeadingPlugin(): JSX.Element {
+    const [editor] = useLexicalComposerContext();
+    const headingTags: HeadingTag[] = ["h1", "h2", "h3"];
+    const Click = (tag: HeadingTag): void => {
+      editor.update(() => {
+        const selection = $getSelection();
+        console.log("primer seleccion", selection);
+        if ($isRangeSelection(selection)) {
+          console.log("la seleccion", selection);
+
+          $setBlocksType(selection, () => $createHeadingNode(tag));
+        }
+      });
+    };
+
+    return (
+      <div>
+        {headingTags.map((tag) => {
+          return (
+            <button
+              onClick={() => {
+                Click(tag);
+              }}
+              key={tag}
+              className="rounded bg-black border border-black mx-2 px-2 py-1"
+            >
+              {tag.toUpperCase()}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+  function TextPlugin() {
+    const [editor] = useLexicalComposerContext();
+    const Click = (): void => {
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          $setBlocksType(selection, () => $createParagraphNode());
+        }
+      });
+    };
+
+    return (
+      <div>
+        <button
+          onClick={() => {
+            Click();
+          }}
+          className="rounded bg-black border border-black mx-2 px-2 py-1"
+        >
+          text
+        </button>
+      </div>
+    );
+  }
+
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <ShowEditorCOmposerState />
-      {/* <AddH1 /> */}
-      {/* <AddText /> */}
-      {/* <DeleteText /> */}
-      <SearchAndReplace />
-
-      <AllTextNode />
+      <div className="flex bg-slate-900 justify-between p-3 rounded">
+        {/* <ShowEditorCOmposerState /> */}
+        {/* <AddH1 /> */}
+        {/* <AddText /> */}
+        {/* <DeleteText /> */}
+        <HeadingPlugin />
+        <TextPlugin />
+        <SearchAndReplace />
+        <AllTextNode />
+      </div>
       <PlainTextPlugin
         contentEditable={
           <ContentEditable className="w-full h-80 border-white border p-3" />
@@ -239,11 +309,6 @@ export function Editor() {
         }}
       />
       <HistoryPlugin />
-      <OtherCustomPlugin
-        onChange={(EditorState) => {
-          console.log(EditorState);
-        }}
-      />
     </LexicalComposer>
   );
 }
