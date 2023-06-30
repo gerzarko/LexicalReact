@@ -26,6 +26,9 @@ import {
   $createParagraphNode,
 } from "lexical";
 import { $setBlocksType } from "@lexical/selection";
+import { Menu } from "@headlessui/react";
+import { Position } from "../../lexical/packages/lexical-playground/src/ui/ColorPicker";
+import { addClassNamesToElement } from "../../lexical/packages/lexical-utils/src/index";
 
 function onChange(editorState: EditorState) {
   editorState.read(() => {
@@ -126,7 +129,7 @@ export function Editor() {
   function SearchAndReplace(): JSX.Element {
     const [editor] = useLexicalComposerContext();
     const [searchText, setSearchText] = useState();
-    const [replaceText, setReplaceText] = useState();
+    const [replaceText, setReplaceText] = useState("");
     // let nodesText: object[] = [];
     const [nodesText, setNodesText] = useState<object[]>();
     const [nodeFound, setNodeFound] = useState([]);
@@ -245,11 +248,12 @@ export function Editor() {
         {headingTags.map((tag) => {
           return (
             <button
-              onClick={() => {
+              onClick={(event) => {
+                event.preventDefault();
                 Click(tag);
               }}
               key={tag}
-              className="rounded bg-black border border-black mx-2 px-2 py-1"
+              className="rounded flex columns-1 hover:bg-gray-300 hover:w-full   px-1 py-1 "
             >
               {tag.toUpperCase()}
             </button>
@@ -275,25 +279,52 @@ export function Editor() {
           onClick={() => {
             Click();
           }}
-          className="rounded bg-black border border-black mx-2 px-2 py-1"
+          className="rounded  mx-2 px-2 py-1"
         >
           text
         </button>
       </div>
     );
   }
+  function MyDropdown(): JSX.Element {
+    return (
+      <Menu as="div" className="relative inline-block text-left">
+        <Menu.Button>More</Menu.Button>
+        <Menu.Items className="absolute  mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none text-black ">
+          <Menu.Item>
+            {({ active }) => (
+              <a className={"hover:bg-sky-700"} href="/account-settings">
+                <HeadingPlugin />
+                <TextPlugin />
+                <AllTextNode />
+              </a>
+            )}
+          </Menu.Item>
+          <Menu.Item>
+            {({ active }) => (
+              <a
+                className={`${active && "bg-blue-500 w-full"}`}
+                href="/account-settings"
+              >
+                <TextPlugin />
+              </a>
+            )}
+          </Menu.Item>
+        </Menu.Items>
+      </Menu>
+    );
+  }
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <div className="flex bg-slate-900 justify-between p-3 rounded">
+      <div className="flex bg-slate-900 justify-between w-1/2 p-3 rounded">
         {/* <ShowEditorCOmposerState /> */}
         {/* <AddH1 /> */}
         {/* <AddText /> */}
         {/* <DeleteText /> */}
-        <HeadingPlugin />
-        <TextPlugin />
+
+        <MyDropdown />
         <SearchAndReplace />
-        <AllTextNode />
       </div>
       <PlainTextPlugin
         contentEditable={
