@@ -29,6 +29,9 @@ import { $setBlocksType } from "@lexical/selection";
 import { Menu } from "@headlessui/react";
 import { Position } from "../../lexical/packages/lexical-playground/src/ui/ColorPicker";
 import { addClassNamesToElement } from "../../lexical/packages/lexical-utils/src/index";
+import Theme from "./Theme";
+import useDarkSide from "./DarkSide";
+import DarkSide from "./DarkSide";
 
 function onChange(editorState: EditorState) {
   editorState.read(() => {
@@ -229,7 +232,7 @@ export function Editor() {
       });
     }
 
-    return <button onClick={all}>Show TextNodes</button>;
+    return <button onClick={all}>Show all text nodes</button>;
   }
 
   type HeadingTag = "h1" | "h2" | "h3";
@@ -315,12 +318,12 @@ export function Editor() {
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <div className="flex text-white bg-gray-900 justify-between  w-full p-3 rounded">
+      <div className="flex text-white  bg-gray-900 dark:bg-white  justify-between  w-full p-3 rounded">
         {/* <ShowEditorCOmposerState /> */}
         {/* <AddH1 /> */}
         {/* <AddText /> */}
         {/* <DeleteText /> */}
-
+        <Theme />
         <MyDropdown />
         <SearchAndReplace />
       </div>
