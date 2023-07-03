@@ -130,7 +130,7 @@ export function Editor() {
     const [editor] = useLexicalComposerContext();
     const [searchText, setSearchText] = useState();
     const [replaceText, setReplaceText] = useState("");
-    // let nodesText: object[] = [];
+
     const [nodesText, setNodesText] = useState<object[]>();
     const [nodeFound, setNodeFound] = useState([]);
     interface Nodos {
@@ -166,6 +166,7 @@ export function Editor() {
         someNode!.select();
 
         someNode!.replace(nodeReplacer);
+
         someNode!.__text.replace(searchText, replaceText);
 
         console.log(someNode, "nodo");
@@ -201,13 +202,18 @@ export function Editor() {
             id="searchText"
             className="w-3/12 mx-2  rounded-sm"
           ></input>
-          <label>Replace</label>
+          <label>Replace:</label>
           <input
+            className="mx-2"
             type="text"
             id="replaceText"
             onChange={handleChangeReplace}
           ></input>
-          <input type="submit" value="Enter" />
+          <input
+            className="mx-2 hover:bg-gray-600 border border-b-gray-50 py-1 px-2 rounded"
+            type="submit"
+            value="Enter"
+          />
         </form>
       </div>
     );
@@ -253,7 +259,7 @@ export function Editor() {
                 Click(tag);
               }}
               key={tag}
-              className="rounded flex columns-1 hover:bg-gray-300 hover:w-full   px-1 py-1 "
+              className="rounded dark:text-black text-white flex columns-1 hover:bg-gray-200 hover:w-full  px-1 py-1 "
             >
               {tag.toUpperCase()}
             </button>
@@ -276,12 +282,13 @@ export function Editor() {
     return (
       <div>
         <button
-          onClick={() => {
+          onClick={(event) => {
+            event.preventDefault();
             Click();
           }}
-          className="rounded  mx-2 px-2 py-1"
+          className="rounded  hover:bg-gray-200 hover:w-full flex  px-1 py-1  "
         >
-          text
+          Normal
         </button>
       </div>
     );
@@ -289,25 +296,16 @@ export function Editor() {
   function MyDropdown(): JSX.Element {
     return (
       <Menu as="div" className="relative inline-block text-left">
-        <Menu.Button>More</Menu.Button>
+        <Menu.Button>Text</Menu.Button>
         <Menu.Items className="absolute  mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none text-black ">
           <Menu.Item>
-            {({ active }) => (
-              <a className={"hover:bg-sky-700"} href="/account-settings">
+            {() => (
+              <div>
                 <HeadingPlugin />
-                <TextPlugin />
+
                 <AllTextNode />
-              </a>
-            )}
-          </Menu.Item>
-          <Menu.Item>
-            {({ active }) => (
-              <a
-                className={`${active && "bg-blue-500 w-full"}`}
-                href="/account-settings"
-              >
                 <TextPlugin />
-              </a>
+              </div>
             )}
           </Menu.Item>
         </Menu.Items>
@@ -317,7 +315,7 @@ export function Editor() {
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <div className="flex bg-slate-900 justify-between w-1/2 p-3 rounded">
+      <div className="flex text-white bg-gray-900 justify-between  w-full p-3 rounded">
         {/* <ShowEditorCOmposerState /> */}
         {/* <AddH1 /> */}
         {/* <AddText /> */}
