@@ -6,7 +6,6 @@ import {
   $createNodeSelection,
   $createRangeSelection,
   $setSelection,
-  removeNode,
   LexicalNode,
 } from "lexical";
 import { useEffect, useState } from "react";
@@ -30,8 +29,6 @@ import { Menu } from "@headlessui/react";
 import { Position } from "../../lexical/packages/lexical-playground/src/ui/ColorPicker";
 import { addClassNamesToElement } from "../../lexical/packages/lexical-utils/src/index";
 import Theme from "./Theme";
-import useDarkSide from "./DarkSide";
-import DarkSide from "./DarkSide";
 
 function onChange(editorState: EditorState) {
   editorState.read(() => {
@@ -203,11 +200,11 @@ export function Editor() {
             onChange={handleChange}
             type="text"
             id="searchText"
-            className="w-3/12 mx-2  rounded-sm"
+            className="w-3/12 mx-2 px-2  rounded-sm"
           ></input>
           <label>Replace:</label>
           <input
-            className="mx-2"
+            className="w-3/12 mx-2  px-2 rounded-sm"
             type="text"
             id="replaceText"
             onChange={handleChangeReplace}
@@ -318,29 +315,30 @@ export function Editor() {
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <div className="flex text-white  bg-gray-900 dark:bg-white  justify-between  w-full p-3 rounded">
-        {/* <ShowEditorCOmposerState /> */}
-        {/* <AddH1 /> */}
-        {/* <AddText /> */}
-        {/* <DeleteText /> */}
-        <Theme />
-        <MyDropdown />
-        <SearchAndReplace />
+      <div className="dark:text-white dark:bg-slate-700 text-black bg-white bg-gray-300 rounded-md border-gray-300 border ">
+        <div className="flex   dark:bg-gray-800 bg-gray-400   justify-between  w-full p-3 rounded-md border-gray-400">
+          {/* <ShowEditorCOmposerState /> */}
+          {/* <AddH1 /> */}
+          {/* <AddText /> */}
+          {/* <DeleteText /> */}
+          <MyDropdown />
+          <SearchAndReplace />
+        </div>
+        <PlainTextPlugin
+          contentEditable={
+            <ContentEditable className="w-full h-80 border-white border p-3" />
+          }
+          placeholder={<div className="">Enter some text...</div>}
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+        <OnChangePlugin onChange={onChange} />
+        <MyOnChangePlugin
+          onChange={(EditorState) => {
+            console.log(EditorState);
+          }}
+        />
+        <HistoryPlugin />
       </div>
-      <PlainTextPlugin
-        contentEditable={
-          <ContentEditable className="w-full h-80 border-white border p-3" />
-        }
-        placeholder={<div className="">Enter some text...</div>}
-        ErrorBoundary={LexicalErrorBoundary}
-      />
-      <OnChangePlugin onChange={onChange} />
-      <MyOnChangePlugin
-        onChange={(EditorState) => {
-          console.log(EditorState);
-        }}
-      />
-      <HistoryPlugin />
     </LexicalComposer>
   );
 }

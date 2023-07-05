@@ -14,10 +14,17 @@ export default function Theme() {
     localStorage.setItem("theme", theme);
   }, [theme, colorTheme]);
 
-  const toggleDarkMode = (checked) => {
+  const toggleDarkMode = (checked: any) => {
     setTheme(colorTheme);
     setDarkSide(checked);
   };
 
-  return <button onClick={toggleDarkMode}>change</button>;
+  return (
+    <button onClick={toggleDarkMode}>
+      <img
+        src="../../screenshots/sun-svgrepo-com.svg"
+        className="h-10 w-10 dark:bg-gray-700 rounded-md dark:hover:bg-gray-5 00 bg-gray-200 hover:bg-gray-300 "
+      ></img>
+    </button>
+  );
 }
